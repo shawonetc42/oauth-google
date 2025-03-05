@@ -9,11 +9,12 @@ const User = require("./models/User"); // Assume a User model is created for Mon
 const app = express();
 app.use(express.json());
 
+// Enable CORS for frontend app
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow your frontend's origin
+  origin: 'http://localhost:3000',  // Add your frontend domain here
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, // Allow cookies, if needed
+  credentials: true, // Allow cookies if necessary
 }));
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
