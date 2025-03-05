@@ -6,7 +6,15 @@ const authRoutes = require("./routes/auth"); // Import the auth route
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // Allow frontend requests
+
+// CORS configuration to allow requests from your frontend
+const corsOptions = {
+  origin: "http://localhost:3000", // Frontend URL
+  methods: "GET,POST",
+  allowedHeaders: "Content-Type,Authorization",
+};
+
+app.use(cors(corsOptions)); // Enable CORS with the specified options
 
 const MONGO_URI = process.env.MONGO_URI; // MongoDB URI
 
