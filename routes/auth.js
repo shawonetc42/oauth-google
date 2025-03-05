@@ -1,3 +1,5 @@
+require('dotenv').config();  // This loads environment variables from .env file
+
 const express = require("express");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
@@ -7,11 +9,12 @@ const User = require("../models/User"); // Ensure the User model path is correct
 const router = express.Router();
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
+const MONGO_URI = process.env.MONGO_URI;
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+// MongoDB connection
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
@@ -27,10 +30,7 @@ mongoose.connect(process.env.MONGO_URI, {
 router.post("/google", async (req, res) => {
   const { token } = req.body;
 
-  console.log("Received token:", token);  // Log the received token for debugging
-
   try {
-    // Verify Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: GOOGLE_CLIENT_ID,
@@ -42,15 +42,11 @@ router.post("/google", async (req, res) => {
     const name = payload.name;
     const picture = payload.picture;
 
-    console.log("User Info:", { userId, email, name, picture });  // Log the user info from Google
-
     // Check if user already exists in the database
     let user = await User.findOne({ googleId: userId });
 
     if (!user) {
-      console.log("User not found, creating new user...");
-
-      // Register new user
+      // Register new user if not found
       user = new User({
         googleId: userId,
         email,
@@ -59,15 +55,21 @@ router.post("/google", async (req, res) => {
       });
 
       await user.save();
-      console.log("New user created:", user);
+      console.log("New user registered:", user);
+    } else {
+      console.log("User already exists:", user);
     }
 
     // Generate JWT Token
-    const jwtToken = jwt.sign({ id: user.id, email, name, picture }, JWT_SECRET, {
-      expiresIn: "1h", // Modify the duration if needed
-    });
+    const jwtToken = jwt.sign(
+      { id: user.id, email, name, picture },
+      JWT_SECRET,
+      {
+        expiresIn: "1h", // Token expiration duration
+      }
+    );
 
-    console.log("JWT Token generated:", jwtToken);  // Log the JWT Token
+    console.log("JWT Token generated:", jwtToken);
 
     res.json({
       message: "User authenticated",
@@ -75,42 +77,36 @@ router.post("/google", async (req, res) => {
       user: { id: user.id, email, name, picture },
     });
   } catch (error) {
-    console.error("Error during Google authentication:", error);  // Log the error
-
-    if (error.response) {
-      // If there's a response from Google API
-      console.error("Google API Error:", error.response.data);
-    }
-
+    console.error("Error in Google Login:", error);
     res.status(400).json({ error: "Invalid token", message: error.message });
   }
 });
 
-// Profile route
+// Profile route - Protected route for user profile
 router.get("/profile", async (req, res) => {
-  const token = req.headers["authorization"]?.split(" ")[1]; // Get the JWT token from the authorization header
-
-  console.log("Received token in profile route:", token);  // Log the token for debugging
+  const token = req.headers["authorization"]?.split(" ")[1]; // Get JWT token from authorization header
 
   if (!token) {
-    console.log("No token provided");  // Log if token is missing
+    console.error("Token not provided");
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
     // Verify the token and extract user information
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log("Decoded JWT Token:", decoded);  // Log the decoded token for debugging
+
+    console.log("Decoded token:", decoded);
 
     // Fetch the user from MongoDB using the decoded user ID
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      console.log("User not found");  // Log if user is not found in DB
+      console.error("User not found in database");
       return res.status(404).json({ error: "User not found" });
     }
 
     // Return the user profile data
+    console.log("User profile data:", user);
     res.json({
       user: {
         id: user.id,
@@ -120,12 +116,7 @@ router.get("/profile", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error during profile retrieval:", error);  // Log the error
-
-    if (error instanceof jwt.JsonWebTokenError) {
-      console.error("JWT Error:", error.message);
-    }
-
+    console.error("Error in Profile route:", error);
     res.status(400).json({ error: "Invalid token", message: error.message });
   }
 });
