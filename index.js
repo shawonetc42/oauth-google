@@ -11,11 +11,12 @@ app.use(express.json());
 
 // Enable CORS for frontend app
 app.use(cors({
-  origin: 'http://localhost:3000',  // Add your frontend domain here
+  origin: ['http://localhost:3000', 'https://oauthfrt.vercel.app'], // Allow both localhost and deployed frontend
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow cookies if necessary
 }));
+
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
