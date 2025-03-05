@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
+// Google login route
 router.post("/google", async (req, res) => {
   const { token } = req.body;
 
@@ -54,6 +55,7 @@ router.post("/google", async (req, res) => {
   }
 });
 
+// Profile route
 router.get("/profile", async (req, res) => {
   const token = req.headers["authorization"]?.split(" ")[1]; // Get the JWT token from the authorization header
 
@@ -84,6 +86,11 @@ router.get("/profile", async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: "Invalid token", message: error.message });
   }
+});
+
+// Hello World API route
+router.get("/hello-world", (req, res) => {
+  res.json({ message: "Hello, World!" });
 });
 
 module.exports = router;
