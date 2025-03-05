@@ -8,7 +8,10 @@ const User = require("./models/User"); // Assume a User model is created for Mon
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // Allow frontend requests
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+})); // Allow only frontend requests from localhost:3000
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -53,7 +56,7 @@ app.post("/auth/google", async (req, res) => {
 
     // Generate JWT Token
     const jwtToken = jwt.sign({ id: user.id, email, name, picture }, JWT_SECRET, {
-      expiresIn: "1h", // You can modify this to a longer duration if needed
+      expiresIn: "1h", // Adjust token expiration as needed
     });
 
     res.json({
