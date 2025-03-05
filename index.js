@@ -9,13 +9,12 @@ const User = require("./models/User"); // Assume a User model is created for Mon
 const app = express();
 app.use(express.json());
 
-// CORS configuration for allowing all origins (any website can access)
-app.use(
-  cors({
-    origin: "*", // Allow all origins
-    credentials: true, // Allow credentials (cookies)
-  })
-);
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow your frontend's origin
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Allow cookies, if needed
+}));
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const JWT_SECRET = process.env.JWT_SECRET;
