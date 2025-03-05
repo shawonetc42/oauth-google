@@ -7,6 +7,13 @@ const authRoutes = require("./routes/auth"); // Import the auth route
 const app = express();
 app.use(express.json());
 
+// Disable COOP Policy
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "unsafe-none" },
+  })
+);
+
 // Define CORS options
 const corsOptions = {
   origin: "http://localhost:3000", // Replace with your frontend URL
