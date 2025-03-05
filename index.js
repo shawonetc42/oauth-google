@@ -9,10 +9,10 @@ const User = require("./models/User"); // Assume a User model is created for Mon
 const app = express();
 app.use(express.json());
 
-// CORS configuration for allowing frontend requests
+// CORS configuration for allowing all origins (any website can access)
 app.use(
   cors({
-    origin: "http://localhost:3000", // Allow frontend requests from this origin
+    origin: "*", // Allow all origins
     credentials: true, // Allow credentials (cookies)
   })
 );
