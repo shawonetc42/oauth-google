@@ -11,10 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS setup with specific frontend origin
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
-  credentials: true, // Allow cookies
+  origin: "http://localhost:3000", // শুধু এই origin অনুমোদিত
+  credentials: true // যদি cookies বা auth headers দরকার হয়
 }));
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
