@@ -26,7 +26,7 @@ app.use(
 
 // Enable CORS
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://yourdomain.com"], // Add allowed frontend domains
+  origin: ["http://localhost:3000", "https://oauthfrt.vercel.app"], // Add allowed frontend domains
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
