@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => console.log("Error connecting to MongoDB:", err));
 
 // Google login route
-router.post("/google", async (req, res) => {
+router.post("/auth/google", async (req, res) => {
   const { token } = req.body;
 
   try {
